@@ -17,6 +17,7 @@ VS Bridge — VS Code Claude ↔ 小龙虾 (WeChat) 桥接脚本
 
 import pyautogui
 import cv2
+import base64
 import numpy as np
 import sys
 
@@ -112,12 +113,20 @@ def bring_vscode_to_front():
 # ======================== 配置 ========================
 DESKTOP = r"E:\zhuomian"
 
-# 模板图片路径
+# 模板图片路径（优先用外部PNG文件，没有则用内置base64）
 TEMPLATES = {
     "working":   os.path.join(DESKTOP, "工作中.png"),
     "done":      os.path.join(DESKTOP, "工作完·待输入文本.png"),
     "send_btn":  os.path.join(DESKTOP, "发送按钮.png"),
     "text_input": os.path.join(DESKTOP, "文本输入框.png"),
+}
+
+# 内置默认模板 (base64) — 用户不用自己截图也能跑
+_TEMPLATE_BASE64 = {
+    "working": "iVBORw0KGgoAAAANSUhEUgAAABsAAAAcCAIAAAAfs1O6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABKklEQVRIie3WT0rDQBQG8G9eBtuAQym4kEoj3diVQnZdhF6g3qC3cFOv4Ka38AYKrrvqLmBXyU4KripaBiRgzXTx8A/YiaQZUMFvOY/58TLzYCKiKAIQKtFrULsOKVAqK4N5hukyj7XhFQngdI/6zZLSW6RAx0fHp4OauVrkAChUYmvuc/pNESoBgHoNqs5xmKJ23RUIpqjsVRSEKWef/B73orQV1NFxazBU3ZOvpWQ80unMttHaY/fsYiPHpYIe/8I5/os/J+rktqBqnfBkPGoNhhtL99eX24g6nSXpecFOW37HOX4jrowziymaZ85Epmi6zF2JTHk7+0GNxKFf9XGYPJrJkwHgBUGQPpvFC3Y9oSSo/B/AXYabh5y5j3mMtYn1a8U2Oe6nZw3em0176rj1QAAAAABJRU5ErkJggg==",
+    "done": "iVBORw0KGgoAAAANSUhEUgAAABsAAAAcCAIAAAAfs1O6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRIie3WMYvCMBQH8H8eaT1QsUiRbn6Czl36/cHZ8VzqVKRXLNRDU7nc8PQQsW1a3sEN95+SkPx4kJBEpWkKIPTVysNMQ2FYLFBfcWhQGMsjGsD6TUWTgdI9CphrzDWmpLKzBUChP557TDRB6CsAtPIEOA5TNNNiIlM0dCs6whS5TA3iJIgTR7dfDOLEC5bcEBBZOWU7U5WmKl3QLpHXH7cb7n7u313QVvGJc0e7anziHlFvsWxb1XoaX3I/6Mgax+Vf/Kui013WVB/iYukuknWf2xemqL6KiUzRoRETmaLC2PwiwOWX25OtAWRne/oS/QEAKIwtjEClv3LCvwGQpmI3WSeffwAAAABJRU5ErkJggg==",
+    "send_btn": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAIAAAC0Ujn1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABQElEQVRIie3WP0vDQBQA8HfXgC14lIKbNNDFTArdOoR+Ar9MNj9CNj9Fv0EG50zdAmYynaSIS6W2EQlYcw53PGOpuTu9W8S35O5y9+Px8odHwjAEN0EduQDgNSdjRiZ9OuyCR8yUHYdlBfNNnZX8AH15QqcDQxIVAqMejHr09Ignq1osUsz3x24zpgMyZuQLPelbKzpS8jLs2pI/KUmbPreWQMqgDkEUB1Gsv1+XDqKYBRdiYJMW3EMy2y7y7SLX1NW0gO6ur8T0MZlp6gp6zzXS1VnvuU2dnZ23HPRa7n3not5+1uGf75/+E7Ti5WvGS3Hrii6L3IiWBdlx1UbtQErSy8oajZSk55vaFo2UpLOSp2sLRUnXHFuRju/7YlS88tUbHHcI84Catzj3Fdw81enzoRZH5J6V77/PXYTDT+YDHBZuxR7gNFkAAAAASUVORK5CYII=",
+    "text_input": "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",
 }
 
 # 状态文件、命令文件、PID文件（单例锁）
@@ -212,16 +221,26 @@ def cv2_imwrite_unicode(filepath, img_np):
 
 def template_match(screenshot_np, template_path, threshold=MATCH_THRESHOLD):
     """
-    在截图中搜索模板图片。
+    在截图中搜索模板图片。先找外部PNG文件，没有就用内置base64模板。
     返回 (center_x, center_y) 或 None
     """
-    if not os.path.exists(template_path):
-        log(f"模板不存在: {template_path}")
-        return None
-
-    template = cv2_imread_unicode(template_path)
+    template = None
+    if os.path.exists(template_path):
+        template = cv2_imread_unicode(template_path)
+    else:
+        # 回退到内置base64
+        name = os.path.basename(template_path).replace(".png","")
+        for key, b64 in _TEMPLATE_BASE64.items():
+            # 名称匹配：去掉·等特殊字符比较
+            key_clean = key.replace("·","").replace("_","")
+            name_clean = name.replace("·","")
+            if key_clean in name_clean or name_clean in key_clean:
+                data = np.frombuffer(base64.b64decode(b64), dtype=np.uint8)
+                template = cv2.imdecode(data, cv2.IMREAD_COLOR)
+                break
     if template is None:
         log(f"无法读取模板: {template_path}")
+        return None
         return None
 
     t_h, t_w = template.shape[:2]
