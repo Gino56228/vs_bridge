@@ -131,7 +131,7 @@ _last_content_hash = None
 # 小龙虾 OpenClaw 发送接口
 NODE_EXE = r"F:\Node.js\node.exe"
 OPENCLAW_JS = r"F:\node_global\node_modules\openclaw\dist\index.js"
-OPENCLAW_TARGET = "o9cq806lf2H-vDTJtymEBOG-nBjo@im.wechat"
+OPENCLAW_TARGET = "你的微信ID@im.wechat"  # 👈 改这里填你的微信ID
 
 # 轮询间隔（秒）
 POLL_INTERVAL = 3
