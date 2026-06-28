@@ -38,28 +38,17 @@
 pip install pyautogui opencv-python pyperclip Pillow
 ```
 
-### 2. 截图模板
+### 2. 配置微信通道
 
-用截图工具截4张图，放到脚本同目录：
-
-| 文件 | 内容 | 大小参考 |
-|------|------|----------|
-| `工作中.png` | 克劳德生成回复时的图标 | 27×28 |
-| `工作完·待输入文本.png` | 克劳德回复完毕的图标 | 27×28 |
-| `文本输入框.png` | VS Code Claude 聊天输入区 | ~687×93 |
-| `发送按钮.png` | 发送按钮 | 30×30 |
-
-### 3. 配置 OpenClaw
-
-编辑 `send_to_wechat()` 函数中的路径：
+编辑 `vs_bridge.py` 第134行：
 
 ```python
-NODE_EXE = r"F:\Node.js\node.exe"
-OPENCLAW_JS = r"F:\node_global\node_modules\openclaw\dist\index.js"
-TARGET = "你的微信ID@im.wechat"
+OPENCLAW_TARGET = "你的微信ID@im.wechat"  # 👈 改这里
 ```
 
-### 4. 运行
+> 模板图已内置base64，**不需要截图**。如果VS Code主题差异大导致识别失败，放同名PNG到桌面即可覆盖内置模板。
+
+### 3. 运行
 
 ```bash
 # 启动监控
