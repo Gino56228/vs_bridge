@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+vs_bridge_status.json
+vs_bridge_command.txt
+claude_output.png
